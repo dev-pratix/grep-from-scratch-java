@@ -4,9 +4,9 @@ public class PatternMatcher {
 
     public static boolean matches(String input, String pattern) {
 
-        if (pattern.startsWith("\\d")) {
+        if (pattern.equals("\\d")) {
             return CharacterClassMatcher.matchDigit(input);
-        } else if (pattern.startsWith("\\w")) {
+        } else if (pattern.equals("\\w")) {
             return CharacterClassMatcher.matchWord(input);
         } else if (pattern.startsWith("[")) {
             return CharacterClassMatcher.matchPositiveGroup(input, pattern);
