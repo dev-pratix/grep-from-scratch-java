@@ -29,7 +29,7 @@ public class Main {
 
     public static boolean matchPattern(String inputLine, String pattern) {
         if (!pattern.isEmpty()) {
-            return PatternMatcher.patternMatcher(inputLine, pattern);
+            return PatternMatcher.matches(inputLine, pattern);
         } else {
             throw new RuntimeException("Unhandled pattern: " + pattern);
         }
