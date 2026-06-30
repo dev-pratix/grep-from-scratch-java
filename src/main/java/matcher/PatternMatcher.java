@@ -20,7 +20,7 @@ public class PatternMatcher {
 
     public static boolean matchWord(String inputLine) {
         for (char c : inputLine.toCharArray()) {
-            if (Character.isLetter(c)) return true;
+            if (Character.isLetterOrDigit(c)) return true;
         }
 
         return false;
