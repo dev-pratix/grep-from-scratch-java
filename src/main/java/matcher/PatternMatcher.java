@@ -2,27 +2,20 @@ package matcher;
 
 public class PatternMatcher {
 
-    public static boolean matches(String inputLine, String pattern) {
-        return switch (pattern) {
-            case "\\d" -> matchDigit(inputLine);
-            case "\\w" -> matchWord(inputLine);
-            default -> inputLine.contains(pattern);
-        };
-    }
+    public static boolean matches(String input, String pattern) {
 
-    public static boolean matchDigit(String inputLine) {
-        for (char c : inputLine.toCharArray()) {
-            if (Character.isDigit(c)) return true;
+        if (pattern.startsWith("\\d")) {
+            return CharacterClassMatcher.matchDigit(input);
+        } else if (pattern.startsWith("\\w")) {
+            return CharacterClassMatcher.matchWord(input);
+        } else if (pattern.startsWith("[")) {
+            return CharacterClassMatcher.matchPositiveGroup(input, pattern);
         }
-
-        return false;
+        return matchLiteral(input, pattern);
     }
 
-    public static boolean matchWord(String inputLine) {
-        for (char c : inputLine.toCharArray()) {
-            if (Character.isLetterOrDigit(c) || c =='_') return true;
-        }
-
-        return false;
+    private static boolean matchLiteral(String input, String pattern) {
+        return input.contains(pattern);
     }
+
 }
