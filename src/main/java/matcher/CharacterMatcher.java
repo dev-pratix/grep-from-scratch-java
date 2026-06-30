@@ -9,26 +9,23 @@ public final class CharacterMatcher {
 
     public static boolean matches(char inputCharacter, Token token) {
         return switch (token.getType()) {
-            case DIGIT ->
-                    matchDigit(inputCharacter);
+            case DIGIT -> matchDigit(inputCharacter);
 
-            case WORD ->
-                    matchWord(inputCharacter);
+            case WORD -> matchWord(inputCharacter);
 
-            case POSITIVE_GROUP ->
-                    matchPositiveGroup(
-                            inputCharacter,
-                            token.getValue());
+            case POSITIVE_GROUP -> matchPositiveGroup(
+                    inputCharacter,
+                    token.getValue());
 
-            case NEGATIVE_GROUP ->
-                    matchNegativeGroup(
-                            inputCharacter,
-                            token.getValue());
+            case NEGATIVE_GROUP -> matchNegativeGroup(
+                    inputCharacter,
+                    token.getValue());
 
-            case LITERAL ->
-                    matchLiteral(
-                            inputCharacter,
-                            token.getValue());
+            case LITERAL -> matchLiteral(
+                    inputCharacter,
+                    token.getValue());
+            case START_ANCHOR -> throw new IllegalStateException(
+                    "START_ANCHOR should never reach CharacterMatcher");
         };
     }
 

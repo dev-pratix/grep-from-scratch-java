@@ -9,6 +9,11 @@ public final class PatternMatcher {
     }
 
     public static boolean matches(String input, String pattern) {
+        Token token = TokenReader.read(pattern, 0);
+        if (token.getType() == TokenType.START_ANCHOR) {
+            return matchFromPosition(input, pattern, 0);
+        }
+
         for (int start = 0; start < input.length(); start++) {
             if (matchFromPosition(input, pattern, start)) {
                 return true;
@@ -35,7 +40,10 @@ public final class PatternMatcher {
 
             Token token = TokenReader.read(pattern, patternIdx);
 
-            if (token.getType() == TokenType.START_ANCHOR) break;
+            if (token.getType() == TokenType.START_ANCHOR) {
+                patternIdx+=token.getLength();
+                continue;
+            }
 
             if (!CharacterMatcher.matches(
                     input.charAt(inputIdx),
