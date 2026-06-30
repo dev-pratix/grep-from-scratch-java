@@ -1,6 +1,7 @@
 package matcher;
 
 import model.Token;
+import model.TokenType;
 
 public final class PatternMatcher {
 
@@ -33,6 +34,8 @@ public final class PatternMatcher {
             }
 
             Token token = TokenReader.read(pattern, patternIdx);
+
+            if (token.getType() == TokenType.START_ANCHOR) break;
 
             if (!CharacterMatcher.matches(
                     input.charAt(inputIdx),
