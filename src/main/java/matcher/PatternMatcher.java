@@ -34,15 +34,19 @@ public final class PatternMatcher {
 
         while (patternIdx < pattern.length()) {
 
-            if (inputIdx >= input.length()) {
+            if (inputIdx > input.length()) {
                 return false;
             }
 
             Token token = TokenReader.read(pattern, patternIdx);
 
             if (token.getType() == TokenType.START_ANCHOR) {
-                patternIdx+=token.getLength();
+                patternIdx += token.getLength();
                 continue;
+            }
+
+            if (token.getType() == TokenType.END_ANCHOR) {
+                return inputIdx == input.length();
             }
 
             if (!CharacterMatcher.matches(

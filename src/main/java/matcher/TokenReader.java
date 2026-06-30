@@ -18,13 +18,18 @@ public class TokenReader {
         return switch (current) {
             case '\\' -> readEscapeToken(pattern, patternIdx);
             case '[' -> readGroupToken(pattern, patternIdx);
-            case '^' -> readAnchorToken();
+            case '^' -> readStartAnchorToken();
+            case '$' -> readEndAnchorToken();
             default -> readLiteralToken(current);
         };
     }
 
-    private static Token readAnchorToken() {
+    private static Token readStartAnchorToken() {
         return new Token(TokenType.START_ANCHOR, 1, "^");
+    }
+
+    private static Token readEndAnchorToken() {
+        return new Token(TokenType.END_ANCHOR, 1, "$");
     }
 
     private static Token readEscapeToken(String pattern, int patternIdx) {
