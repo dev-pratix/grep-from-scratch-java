@@ -8,6 +8,8 @@ public class PatternMatcher {
             return CharacterClassMatcher.matchDigit(input);
         } else if (pattern.equals("\\w")) {
             return CharacterClassMatcher.matchWord(input);
+        } else if (pattern.startsWith("[^")) {
+            return CharacterClassMatcher.matchNegativeGroup(input, pattern);
         } else if (pattern.startsWith("[")) {
             return CharacterClassMatcher.matchPositiveGroup(input, pattern);
         }

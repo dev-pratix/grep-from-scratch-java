@@ -2,17 +2,39 @@ package matcher;
 
 public class CharacterClassMatcher {
 
-    public static boolean matchPositiveGroup(String input, String pattern) {
-        if (pattern.length() < 3) return false; // at least 3 args
-        int startIdx = pattern.indexOf("[");
-        int endIdx = pattern.indexOf("]");
-        if (startIdx >= endIdx) return false;
+    private static String extractGroupCharacters(String pattern) {
+        if (!pattern.startsWith("[") || !pattern.endsWith("]")) {
+            throw new IllegalArgumentException("Invalid character group: " + pattern);
+        }
 
-        String extractedString = pattern.substring(startIdx + 1, endIdx);
-        for (int i = 0; i < input.length(); i++) {
-            for (int j = startIdx + 1; j < extractedString.length(); j++) {
-                if (input.charAt(i) == pattern.charAt(j)) return true;
+        int start = pattern.startsWith("[^") ? 2 : 1;
+
+        return pattern.substring(start, pattern.length() - 1);
+    }
+
+    private static boolean containsCharacter(String group, char c) {
+        for (int i = 0; i < group.length(); i++) {
+            if (group.charAt(i) == c) {
+                return true;
             }
+        }
+
+        return false;
+    }
+
+    public static boolean matchPositiveGroup(String input, String pattern) {
+        String group = extractGroupCharacters(pattern);
+        for (int i = 0; i < input.length(); i++) {
+            if (containsCharacter(group, input.charAt(i))) return true;
+        }
+        return false;
+    }
+
+
+    public static boolean matchNegativeGroup(String input, String pattern) {
+        String group = extractGroupCharacters(pattern);
+        for (int i = 0; i < input.length(); i++) {
+            if (!containsCharacter(group, input.charAt(i))) return true;
         }
         return false;
     }
