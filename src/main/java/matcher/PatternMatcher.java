@@ -9,12 +9,15 @@ public final class PatternMatcher {
     }
 
     public static boolean matches(String input, String pattern) {
-        Token token = TokenReader.read(pattern, 0);
-        if (token.getType() == TokenType.START_ANCHOR) {
+
+        Token firstToken = TokenReader.read(pattern, 0);
+
+        if (firstToken.getType() == TokenType.START_ANCHOR) {
             return matchFromPosition(input, pattern, 0);
         }
 
         for (int start = 0; start < input.length(); start++) {
+
             if (matchFromPosition(input, pattern, start)) {
                 return true;
             }
@@ -34,29 +37,28 @@ public final class PatternMatcher {
 
         while (patternIdx < pattern.length()) {
 
-            if (inputIdx > input.length()) {
-                return false;
-            }
-
-            Token token = TokenReader.read(pattern, patternIdx);
-
-            if (token.getType() == TokenType.START_ANCHOR) {
-                patternIdx += token.getLength();
+            Token currentToken = TokenReader.read(pattern, patternIdx);
+            if (currentToken.getType() == TokenType.START_ANCHOR) {
+                patternIdx += currentToken.getLength();
                 continue;
             }
 
-            if (token.getType() == TokenType.END_ANCHOR) {
+            if (currentToken.getType() == TokenType.END_ANCHOR) {
                 return inputIdx == input.length();
+            }
+
+            if (inputIdx >= input.length()) {
+                return false;
             }
 
             if (!CharacterMatcher.matches(
                     input.charAt(inputIdx),
-                    token)) {
+                    currentToken)) {
                 return false;
             }
 
             inputIdx++;
-            patternIdx += token.getLength();
+            patternIdx += currentToken.getLength();
         }
 
         return true;
