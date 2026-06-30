@@ -3,6 +3,7 @@ package matcher;
 public class CharacterClassMatcher {
 
     public static boolean matchPositiveGroup(String input, String pattern) {
+        if (pattern.length() < 3) return false;
         int startIdx = pattern.indexOf("[");
         int endIdx = pattern.indexOf("]");
         if (startIdx >= endIdx) return false;
