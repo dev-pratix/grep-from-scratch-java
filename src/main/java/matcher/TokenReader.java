@@ -20,6 +20,7 @@ public class TokenReader {
             case '[' -> readGroupToken(pattern, patternIdx);
             case '^' -> readStartAnchorToken();
             case '$' -> readEndAnchorToken();
+            case '+' -> readPlusQuantifierToken();
             default -> readLiteralToken(current);
         };
     }
@@ -30,6 +31,10 @@ public class TokenReader {
 
     private static Token readEndAnchorToken() {
         return new Token(TokenType.END_ANCHOR, 1, "$");
+    }
+
+    private static Token readPlusQuantifierToken() {
+        return new Token(TokenType.PLUS, 1, "+");
     }
 
     private static Token readEscapeToken(String pattern, int patternIdx) {

@@ -1,4 +1,5 @@
 import matcher.PatternMatcher;
+import matcher.RecursivePatternMatcher;
 
 import java.util.Scanner;
 
@@ -29,7 +30,7 @@ public class Main {
 
     public static boolean matchPattern(String inputLine, String pattern) {
         if (!pattern.isEmpty()) {
-            return PatternMatcher.matches(inputLine, pattern);
+            return RecursivePatternMatcher.matches(inputLine, pattern);
         } else {
             throw new RuntimeException("Unhandled pattern: " + pattern);
         }

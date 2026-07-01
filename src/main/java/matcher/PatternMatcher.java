@@ -2,7 +2,17 @@ package matcher;
 
 import model.Token;
 import model.TokenType;
-
+/**
+ * First iterative regex engine.
+ *
+ * Supports:
+ * - Literals
+ * - Character classes
+ * - Character groups
+ * - Anchors
+ *
+ * Doesn't support backtracking-based quantifiers.
+ */
 public final class PatternMatcher {
 
     private PatternMatcher() {
@@ -38,6 +48,13 @@ public final class PatternMatcher {
         while (patternIdx < pattern.length()) {
 
             Token currentToken = TokenReader.read(pattern, patternIdx);
+
+            Token nextToken = null;
+            if (pattern.length() > patternIdx + currentToken.getLength()) {
+                nextToken = TokenReader.read(pattern, patternIdx + currentToken.getLength());
+            }
+
+
             if (currentToken.getType() == TokenType.START_ANCHOR) {
                 patternIdx += currentToken.getLength();
                 continue;
@@ -57,10 +74,25 @@ public final class PatternMatcher {
                 return false;
             }
 
+            if (nextToken != null && nextToken.getType() == TokenType.PLUS) {
+                inputIdx = consumeOneOrMoreGreedily(input, inputIdx, currentToken);
+                patternIdx += currentToken.getLength();
+                patternIdx += nextToken.getLength();
+                continue;
+            }
+
             inputIdx++;
             patternIdx += currentToken.getLength();
         }
 
         return true;
+    }
+
+    public static int consumeOneOrMoreGreedily(String input, int startIdx, Token currentToken) {
+        startIdx++;
+        while (startIdx < input.length() && CharacterMatcher.matches(input.charAt(startIdx), currentToken)) {
+            startIdx++;
+        }
+        return startIdx;
     }
 }
