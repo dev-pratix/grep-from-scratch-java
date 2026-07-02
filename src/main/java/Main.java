@@ -10,21 +10,20 @@ public class Main {
         }
 
         String pattern = args[1];
-        Scanner scanner = new Scanner(System.in);
-        String inputLine = scanner.nextLine();
 
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.err.println("Logs from your program will appear here!");
-
-        String[] inputLines = inputLine.split("\n");
-        for (String input : inputLines) {
-            if (matchPattern(input, pattern)) {
-                System.out.print(inputLine);
-                System.exit(0);
+        boolean foundMatch = false;
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            String inputLine = scanner.nextLine();
+            if (matchPattern(inputLine, pattern)) {
+                System.out.println(inputLine);
+                foundMatch = true;
             }
         }
-        System.exit(1);
 
+        System.exit(foundMatch ? 0 : 1);
     }
 
     public static boolean matchPattern(String inputLine, String pattern) {
