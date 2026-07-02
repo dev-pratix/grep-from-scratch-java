@@ -78,6 +78,15 @@ public final class RecursivePatternMatcher {
                     yield false;
                 }
 
+                if(currentToken.getType() == TokenType.ALTERNATION){
+                    String[] alternationStrings = currentToken.getValue().split("|");
+                    for(String alternationString : alternationStrings){
+                        if(doesRemainingPatternMatchHere(input,inputIdx,alternationString,0)) yield true;
+                    }
+
+                    yield false;
+                }
+
                 if (nextToken != null && nextToken.getType() == TokenType.QUESTION_MARK) {
                     int remainingPatternIdx = nextPatternIdx + nextToken.getLength();
                     if (doesRemainingPatternMatchHere(input, inputIdx + 1, pattern, remainingPatternIdx)) {

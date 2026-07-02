@@ -23,8 +23,27 @@ public class TokenReader {
             case '+' -> readPlusQuantifierToken();
             case '?' -> readQuestionQuantifierToken();
             case '.' -> readWildCardToken();
+            case '(' -> readAlternationToken(pattern, patternIdx);
             default -> readLiteralToken(current);
         };
+    }
+
+    private static Token readAlternationToken(
+            String pattern,
+            int patternIdx) {
+        int closingParenIdx = pattern.indexOf(')', patternIdx);
+        if (closingParenIdx == -1) {
+            throw new IllegalArgumentException(
+                    "Missing closing parenthesis");
+        }
+
+        String value = pattern.substring(
+                patternIdx + 1,
+                closingParenIdx);
+        return new Token(
+                TokenType.ALTERNATION,
+                closingParenIdx - patternIdx + 1,
+                value);
     }
 
     private static Token readWildCardToken() {
