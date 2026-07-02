@@ -1,4 +1,3 @@
-import matcher.PatternMatcher;
 import matcher.RecursivePatternMatcher;
 
 import java.util.Scanner;
@@ -17,12 +16,15 @@ public class Main {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.err.println("Logs from your program will appear here!");
 
-        if (matchPattern(inputLine, pattern)) {
-            System.out.print(inputLine);
-            System.exit(0);
-        } else {
-            System.exit(1);
+        String[] inputLines = inputLine.split("\n");
+        for (String input : inputLines) {
+            if (matchPattern(input, pattern)) {
+                System.out.print(inputLine);
+                System.exit(0);
+            }
         }
+        System.exit(1);
+
     }
 
     public static boolean matchPattern(String inputLine, String pattern) {
