@@ -21,6 +21,7 @@ public class TokenReader {
             case '^' -> readStartAnchorToken();
             case '$' -> readEndAnchorToken();
             case '+' -> readPlusQuantifierToken();
+            case '?' -> readQuestionQuantifierToken();
             default -> readLiteralToken(current);
         };
     }
@@ -77,5 +78,9 @@ public class TokenReader {
     // created this only for literals ok future pratikk
     private static Token readLiteralToken(Character c) {
         return new Token(TokenType.LITERAL, 1, String.valueOf(c));
+    }
+
+    private static Token readQuestionQuantifierToken() {
+        return new Token(TokenType.QUESTION_MARK, 1, "?");
     }
 }

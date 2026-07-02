@@ -24,7 +24,7 @@ public final class CharacterMatcher {
             case LITERAL -> matchLiteral(
                     inputCharacter,
                     token.getValue());
-            case START_ANCHOR, END_ANCHOR, PLUS -> throw new IllegalStateException(
+            case START_ANCHOR, END_ANCHOR, PLUS,QUESTION_MARK -> throw new IllegalStateException(
                    "["+ token.getType() + "] should never reach CharacterMatcher");
         };
     }

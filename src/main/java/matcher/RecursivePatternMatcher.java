@@ -78,10 +78,12 @@ public final class RecursivePatternMatcher {
                     yield false;
                 }
 
-                if (!CharacterMatcher.matches(
-                        input.charAt(inputIdx),
-                        currentToken)) {
-                    yield false;
+                if (nextToken != null && nextToken.getType() == TokenType.QUESTION_MARK) {
+                    int remainingPatternIdx = nextPatternIdx + nextToken.getLength();
+                    if (doesRemainingPatternMatchHere(input, inputIdx + 1, pattern, remainingPatternIdx)) {
+                        yield true;
+                    }
+                    yield doesRemainingPatternMatchHere(input, inputIdx, pattern, remainingPatternIdx);
                 }
 
                 if (nextToken != null
@@ -92,7 +94,6 @@ public final class RecursivePatternMatcher {
                     int candidateStartIdx = inputIdx + 1;
 
                     while (true) {
-
                         if (doesRemainingPatternMatchHere(
                                 input,
                                 candidateStartIdx,
@@ -113,6 +114,12 @@ public final class RecursivePatternMatcher {
                         candidateStartIdx++;
                     }
 
+                    yield false;
+                }
+
+                if (!CharacterMatcher.matches(
+                        input.charAt(inputIdx),
+                        currentToken)) {
                     yield false;
                 }
 
