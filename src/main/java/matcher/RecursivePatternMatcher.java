@@ -1,5 +1,6 @@
 package matcher;
 
+import model.MatchResult;
 import model.Token;
 import model.TokenType;
 
@@ -8,7 +9,7 @@ public final class RecursivePatternMatcher {
     private RecursivePatternMatcher() {
     }
 
-    public static boolean matches(String input, String pattern) {
+    public static MatchResult findMatch(String input, String pattern) {
         Token firstToken = TokenReader.read(pattern, 0);
 
         if (firstToken.getType() == TokenType.START_ANCHOR) {
@@ -17,26 +18,34 @@ public final class RecursivePatternMatcher {
 
         // s o here we will start the input val per increment and pattern will always start 0
         for (int start = 0; start < input.length(); start++) {
-            if (doesRemainingPatternMatchHere(
+            MatchResult result = doesRemainingPatternMatchHere(
                     input,
                     start,
                     pattern,
-                    0)) {
-
-                return true;
+                    0);
+            if (result.getMatched()) {
+                return new MatchResult(
+                        true,
+                        start,
+                        result.getEndIdx()
+                );
             }
         }
-        return false;
+        return new MatchResult(false, -1, -1);
     }
 
-    private static boolean doesRemainingPatternMatchHere(
+    private static MatchResult doesRemainingPatternMatchHere(
             String input,
             int inputIdx,
             String pattern,
             int patternIdx) {
 
         if (patternIdx == pattern.length()) {
-            return true;
+            return new MatchResult(
+                    true,
+                    -1,
+                    inputIdx
+            );
         }
         Token currentToken = TokenReader.read(pattern, patternIdx);
 
@@ -50,7 +59,7 @@ public final class RecursivePatternMatcher {
         return switch (currentToken.getType()) {
             case START_ANCHOR -> {
                 if (inputIdx != 0) {
-                    yield false;
+                    yield new MatchResult(false, -1, -1);
                 }
 
                 yield doesRemainingPatternMatchHere(
@@ -62,7 +71,7 @@ public final class RecursivePatternMatcher {
             }
             case END_ANCHOR -> {
                 if (inputIdx != input.length()) {
-                    yield false;
+                    yield new MatchResult(false, -1, -1);
                 }
                 yield doesRemainingPatternMatchHere(
                         input,
@@ -78,28 +87,30 @@ public final class RecursivePatternMatcher {
 
                 for (String alternationString : alternationStrings) {
                     String completePattern = alternationString + remainingPattern;
-                    if (doesRemainingPatternMatchHere(input, inputIdx, completePattern, 0)) {
-                        yield true;
+                    MatchResult result = doesRemainingPatternMatchHere(input, inputIdx, completePattern, 0);
+                    if (result.getMatched()) {
+                        yield result;
                     }
                 }
 
-                yield false;
+                yield new MatchResult(false, -1, -1);
             }
 
             default -> {
                 if (nextToken != null && nextToken.getType() == TokenType.QUESTION_MARK) {
                     int remainingPatternIdx = nextPatternIdx + nextToken.getLength();
+                    MatchResult result = doesRemainingPatternMatchHere(
+                            input,
+                            inputIdx + 1,
+                            pattern,
+                            remainingPatternIdx);
                     if (inputIdx < input.length()
                             && CharacterMatcher.matches(
                             input.charAt(inputIdx),
                             currentToken)
-                            && doesRemainingPatternMatchHere(
-                            input,
-                            inputIdx + 1,
-                            pattern,
-                            remainingPatternIdx)) {
+                            && result.getMatched()) {
 
-                        yield true;
+                        yield result;
                     }
 
                     yield doesRemainingPatternMatchHere(
@@ -112,7 +123,11 @@ public final class RecursivePatternMatcher {
                 if (nextToken != null
                         && nextToken.getType() == TokenType.PLUS) {
                     if (!CharacterMatcher.matches(input.charAt(inputIdx), currentToken)) {
-                        yield false;
+                        yield new MatchResult(
+                                false,
+                                -1,
+                                -1
+                        );
                     }
                     int remainingPatternIdx =
                             nextPatternIdx + nextToken.getLength();
@@ -120,13 +135,13 @@ public final class RecursivePatternMatcher {
                     int candidateStartIdx = inputIdx + 1;
 
                     while (true) {
-                        if (doesRemainingPatternMatchHere(
+                        MatchResult result = doesRemainingPatternMatchHere(
                                 input,
                                 candidateStartIdx,
                                 pattern,
-                                remainingPatternIdx)) {
-
-                            yield true;
+                                remainingPatternIdx);
+                        if (result.getMatched()) {
+                            yield result;
                         }
 
                         if (candidateStartIdx >= input.length()
@@ -140,17 +155,29 @@ public final class RecursivePatternMatcher {
                         candidateStartIdx++;
                     }
 
-                    yield false;
+                    yield new MatchResult(
+                            false,
+                            -1,
+                            -1
+                    );
                 }
 
                 if (inputIdx == input.length()) {
-                    yield false;
+                    yield new MatchResult(
+                            false,
+                            -1,
+                            -1
+                    );
                 }
 
                 if (!CharacterMatcher.matches(
                         input.charAt(inputIdx),
                         currentToken)) {
-                    yield false;
+                    yield new MatchResult(
+                            false,
+                            -1,
+                            -1
+                    );
                 }
 
                 yield doesRemainingPatternMatchHere(
