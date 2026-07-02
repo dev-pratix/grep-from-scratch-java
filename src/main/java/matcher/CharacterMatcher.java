@@ -24,9 +24,14 @@ public final class CharacterMatcher {
             case LITERAL -> matchLiteral(
                     inputCharacter,
                     token.getValue());
-            case START_ANCHOR, END_ANCHOR, PLUS,QUESTION_MARK -> throw new IllegalStateException(
-                   "["+ token.getType() + "] should never reach CharacterMatcher");
+            case WILDCARD -> matchWildCard(inputCharacter);
+            case START_ANCHOR, END_ANCHOR, PLUS, QUESTION_MARK -> throw new IllegalStateException(
+                    "[" + token.getType() + "] should never reach CharacterMatcher");
         };
+    }
+
+    private static boolean matchWildCard(char c) {
+        return c != '\n';
     }
 
     private static boolean matchDigit(char c) {

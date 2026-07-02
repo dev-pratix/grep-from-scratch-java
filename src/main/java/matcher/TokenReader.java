@@ -22,8 +22,13 @@ public class TokenReader {
             case '$' -> readEndAnchorToken();
             case '+' -> readPlusQuantifierToken();
             case '?' -> readQuestionQuantifierToken();
+            case '.' -> readWildCardToken();
             default -> readLiteralToken(current);
         };
+    }
+
+    private static Token readWildCardToken() {
+        return new Token(TokenType.WILDCARD, 1, ".");
     }
 
     private static Token readStartAnchorToken() {

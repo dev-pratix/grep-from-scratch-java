@@ -41,7 +41,7 @@ public final class RecursivePatternMatcher {
 
         Token currentToken = TokenReader.read(pattern, patternIdx);
 
-        int nextPatternIdx = patternIdx + currentToken.getLength();
+        int  nextPatternIdx = patternIdx + currentToken.getLength();
 
         Token nextToken = null;
         if (nextPatternIdx < pattern.length()) {
