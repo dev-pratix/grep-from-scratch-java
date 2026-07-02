@@ -9,7 +9,11 @@ public final class RecursivePatternMatcher {
     private RecursivePatternMatcher() {
     }
 
-    public static MatchResult findMatch(String input, String pattern) {
+    public static MatchResult findMatch(String input , String pattern){
+        return findMatch(input,pattern,0);
+    }
+
+    public static MatchResult findMatch(String input, String pattern,int searchStart) {
         Token firstToken = TokenReader.read(pattern, 0);
 
         if (firstToken.getType() == TokenType.START_ANCHOR) {
@@ -27,7 +31,7 @@ public final class RecursivePatternMatcher {
         }
 
         // s o here we will start the input val per increment and pattern will always start 0
-        for (int start = 0; start < input.length(); start++) {
+        for (int start = searchStart; start < input.length(); start++) {
             MatchResult result = doesRemainingPatternMatchHere(
                     input,
                     start,
