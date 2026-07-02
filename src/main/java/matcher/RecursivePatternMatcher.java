@@ -78,7 +78,6 @@ public final class RecursivePatternMatcher {
 
                 for (String alternationString : alternationStrings) {
                     String completePattern = alternationString + remainingPattern;
-                    System.out.println("Trying: " + completePattern);
                     if (doesRemainingPatternMatchHere(input, inputIdx, completePattern, 0)) {
                         yield true;
                     }
