@@ -13,7 +13,17 @@ public final class RecursivePatternMatcher {
         Token firstToken = TokenReader.read(pattern, 0);
 
         if (firstToken.getType() == TokenType.START_ANCHOR) {
-            return doesRemainingPatternMatchHere(input, 0, pattern, 0);
+            MatchResult result = doesRemainingPatternMatchHere(input, 0, pattern, 0);
+
+            if (result.getMatched()) {
+                return new MatchResult(
+                        true,
+                        0,
+                        result.getEndIdx()
+                );
+            }
+
+            return result;
         }
 
         // s o here we will start the input val per increment and pattern will always start 0
