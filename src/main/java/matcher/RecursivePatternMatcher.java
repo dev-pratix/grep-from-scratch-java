@@ -20,10 +20,7 @@ public final class RecursivePatternMatcher {
             MatchResult result = doesRemainingPatternMatchHere(input, 0, pattern, 0);
 
             if (result.getMatched()) {
-                return new MatchResult(
-                        true,
-                        0,
-                        result.getEndIdx()
+                return new MatchResult(true,0,result.getEndIdx()
                 );
             }
 
@@ -32,11 +29,7 @@ public final class RecursivePatternMatcher {
 
         // s o here we will start the input val per increment and pattern will always start 0
         for (int start = searchStart; start < input.length(); start++) {
-            MatchResult result = doesRemainingPatternMatchHere(
-                    input,
-                    start,
-                    pattern,
-                    0);
+            MatchResult result = doesRemainingPatternMatchHere(input,start,pattern,0);
             if (result.getMatched()) {
                 return new MatchResult(
                         true,
