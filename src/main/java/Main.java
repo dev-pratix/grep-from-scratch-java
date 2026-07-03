@@ -63,7 +63,7 @@ public class Main {
         boolean foundMatch = false;
         while (scanner.hasNext()) {
             String inputLine = scanner.nextLine();
-            if (options.getOnlyMatches()) {
+            if (options.isOnlyMatching()) {
                 foundMatch |= printOnlyMatches(inputLine, options.getPattern());
             } else {
                 foundMatch |= printMatchingLine(inputLine, options.getPattern(), options.getHighlight());

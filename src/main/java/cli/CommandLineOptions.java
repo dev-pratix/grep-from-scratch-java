@@ -5,9 +5,13 @@ public class CommandLineOptions {
     private final boolean onlyMatches;
     private final String pattern;
 
-    public CommandLineOptions(boolean highlight, boolean onlyMatches, String pattern) {
-        this.highlight = highlight;
+    public CommandLineOptions(
+            boolean onlyMatches,
+            boolean highlight,
+            String pattern) {
+
         this.onlyMatches = onlyMatches;
+        this.highlight = highlight;
         this.pattern = pattern;
     }
 
@@ -15,7 +19,7 @@ public class CommandLineOptions {
         return highlight;
     }
 
-    public boolean getOnlyMatches() {
+    public boolean isOnlyMatching() {
         return onlyMatches;
     }
 
