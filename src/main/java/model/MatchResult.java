@@ -11,6 +11,14 @@ public class MatchResult {
         this.endIdx = endIdx;
     }
 
+    public static MatchResult match(int startIdx, int endIdx){
+        return new MatchResult(true,startIdx,endIdx);
+    }
+
+    public static MatchResult noMatch() {
+        return new MatchResult(false, -1, -1);
+    }
+
     public boolean getMatched() {
         return matched;
     }

@@ -4,41 +4,58 @@ import model.MatchResult;
 import model.Token;
 import model.TokenType;
 
+/**
+ * Recursive regex engine.
+ * <p>
+ * Given an input string and a pattern, recursively determines whether
+ * the remaining pattern matches the remaining input.
+ * <p>
+ * This class is intentionally recursive because regex matching naturally
+ * forms a recursive/backtracking problem.
+ */
 public final class RecursivePatternMatcher {
 
     private RecursivePatternMatcher() {
     }
 
-    public static MatchResult findMatch(String input , String pattern){
-        return findMatch(input,pattern,0);
+    /**
+     * Finds the first occurrence of the pattern in the input.
+     * <p>
+     * Search always begins from index 0.
+     */
+    public static MatchResult findMatch(String input, String pattern) {
+        return findMatch(input, pattern, 0);
     }
 
-    public static MatchResult findMatch(String input, String pattern,int searchStart) {
+    /**
+     * Searches for the first match starting from searchStart.
+     * <p>
+     * Used by:
+     * - normal grep (searchStart = 0)
+     * - grep -o (continue searching after previous match)
+     */
+    public static MatchResult findMatch(String input, String pattern, int searchStart) {
         Token firstToken = TokenReader.read(pattern, 0);
-
         if (firstToken.getType() == TokenType.START_ANCHOR) {
             MatchResult result = doesRemainingPatternMatchHere(input, 0, pattern, 0);
 
             if (result.getMatched()) {
-                return new MatchResult(true,0,result.getEndIdx()
+                return new MatchResult(true, 0, result.getEndIdx()
                 );
             }
 
             return result;
         }
 
-        // s o here we will start the input val per increment and pattern will always start 0
+        // Try matching the pattern starting at every possible
+// position until a complete match is found.
         for (int start = searchStart; start < input.length(); start++) {
-            MatchResult result = doesRemainingPatternMatchHere(input,start,pattern,0);
+            MatchResult result = doesRemainingPatternMatchHere(input, start, pattern, 0);
             if (result.getMatched()) {
-                return new MatchResult(
-                        true,
-                        start,
-                        result.getEndIdx()
-                );
+                return MatchResult.match(start, result.getEndIdx());
             }
         }
-        return new MatchResult(false, -1, -1);
+        return MatchResult.noMatch();
     }
 
     private static MatchResult doesRemainingPatternMatchHere(
@@ -46,18 +63,12 @@ public final class RecursivePatternMatcher {
             int inputIdx,
             String pattern,
             int patternIdx) {
-
         if (patternIdx == pattern.length()) {
-            return new MatchResult(
-                    true,
-                    -1,
-                    inputIdx
-            );
+            return MatchResult.match(-1, inputIdx);
         }
+
         Token currentToken = TokenReader.read(pattern, patternIdx);
-
         int nextPatternIdx = patternIdx + currentToken.getLength();
-
         Token nextToken = null;
         if (nextPatternIdx < pattern.length()) {
             nextToken = TokenReader.read(pattern, nextPatternIdx);
@@ -66,7 +77,7 @@ public final class RecursivePatternMatcher {
         return switch (currentToken.getType()) {
             case START_ANCHOR -> {
                 if (inputIdx != 0) {
-                    yield new MatchResult(false, -1, -1);
+                    yield MatchResult.noMatch();
                 }
 
                 yield doesRemainingPatternMatchHere(
@@ -78,7 +89,7 @@ public final class RecursivePatternMatcher {
             }
             case END_ANCHOR -> {
                 if (inputIdx != input.length()) {
-                    yield new MatchResult(false, -1, -1);
+                    yield MatchResult.noMatch();
                 }
                 yield doesRemainingPatternMatchHere(
                         input,
@@ -100,7 +111,7 @@ public final class RecursivePatternMatcher {
                     }
                 }
 
-                yield new MatchResult(false, -1, -1);
+                yield MatchResult.noMatch();
             }
 
             default -> {
@@ -130,11 +141,7 @@ public final class RecursivePatternMatcher {
                 if (nextToken != null
                         && nextToken.getType() == TokenType.PLUS) {
                     if (!CharacterMatcher.matches(input.charAt(inputIdx), currentToken)) {
-                        yield new MatchResult(
-                                false,
-                                -1,
-                                -1
-                        );
+                        yield MatchResult.noMatch();
                     }
                     int remainingPatternIdx =
                             nextPatternIdx + nextToken.getLength();
@@ -158,33 +165,19 @@ public final class RecursivePatternMatcher {
 
                             break;
                         }
-
                         candidateStartIdx++;
                     }
-
-                    yield new MatchResult(
-                            false,
-                            -1,
-                            -1
-                    );
+                    yield MatchResult.noMatch();
                 }
 
                 if (inputIdx == input.length()) {
-                    yield new MatchResult(
-                            false,
-                            -1,
-                            -1
-                    );
+                    yield MatchResult.noMatch();
                 }
 
                 if (!CharacterMatcher.matches(
                         input.charAt(inputIdx),
                         currentToken)) {
-                    yield new MatchResult(
-                            false,
-                            -1,
-                            -1
-                    );
+                    yield MatchResult.noMatch();
                 }
 
                 yield doesRemainingPatternMatchHere(
