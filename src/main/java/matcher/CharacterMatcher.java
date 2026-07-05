@@ -25,7 +25,7 @@ public final class CharacterMatcher {
                     inputCharacter,
                     token.getValue());
             case WILDCARD -> matchWildCard(inputCharacter);
-            case START_ANCHOR, END_ANCHOR, PLUS, QUESTION_MARK, ALTERNATION -> throw new IllegalStateException(
+            case START_ANCHOR, END_ANCHOR, PLUS, QUESTION_MARK, ALTERNATION, STAR -> throw new IllegalStateException(
                     "[" + token.getType() + "] should never reach CharacterMatcher");
         };
     }

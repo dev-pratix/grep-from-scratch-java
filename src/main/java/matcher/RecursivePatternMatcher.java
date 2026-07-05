@@ -69,10 +69,10 @@ public final class RecursivePatternMatcher {
 
         Token currentToken = TokenReader.read(pattern, patternIdx);
         int nextPatternIdx = patternIdx + currentToken.getLength();
-        Token nextToken = null;
-        if (nextPatternIdx < pattern.length()) {
-            nextToken = TokenReader.read(pattern, nextPatternIdx);
-        }
+        Token nextToken =
+                nextPatternIdx < pattern.length()
+                        ? TokenReader.read(pattern, nextPatternIdx)
+                        : null;
 
         return switch (currentToken.getType()) {
             case START_ANCHOR -> {
@@ -116,58 +116,16 @@ public final class RecursivePatternMatcher {
 
             default -> {
                 if (nextToken != null && nextToken.getType() == TokenType.QUESTION_MARK) {
-                    int remainingPatternIdx = nextPatternIdx + nextToken.getLength();
-                    MatchResult result = doesRemainingPatternMatchHere(
-                            input,
-                            inputIdx + 1,
-                            pattern,
-                            remainingPatternIdx);
-                    if (inputIdx < input.length()
-                            && CharacterMatcher.matches(
-                            input.charAt(inputIdx),
-                            currentToken)
-                            && result.getMatched()) {
+                    yield handleQuestionMark(input, inputIdx, pattern, nextPatternIdx, currentToken, nextToken);
+                }
 
-                        yield result;
-                    }
-
-                    yield doesRemainingPatternMatchHere(
-                            input,
-                            inputIdx,
-                            pattern,
-                            remainingPatternIdx);
+                if (nextToken != null && nextToken.getType() == TokenType.STAR) {
+                    yield handleStar(input, inputIdx, pattern, nextPatternIdx, currentToken, nextToken);
                 }
 
                 if (nextToken != null
                         && nextToken.getType() == TokenType.PLUS) {
-                    if (!CharacterMatcher.matches(input.charAt(inputIdx), currentToken)) {
-                        yield MatchResult.noMatch();
-                    }
-                    int remainingPatternIdx =
-                            nextPatternIdx + nextToken.getLength();
-
-                    int candidateStartIdx = inputIdx + 1;
-
-                    while (true) {
-                        MatchResult result = doesRemainingPatternMatchHere(
-                                input,
-                                candidateStartIdx,
-                                pattern,
-                                remainingPatternIdx);
-                        if (result.getMatched()) {
-                            yield result;
-                        }
-
-                        if (candidateStartIdx >= input.length()
-                                || !CharacterMatcher.matches(
-                                input.charAt(candidateStartIdx),
-                                currentToken)) {
-
-                            break;
-                        }
-                        candidateStartIdx++;
-                    }
-                    yield MatchResult.noMatch();
+                    yield handlePlus(input, inputIdx, pattern, nextPatternIdx, currentToken, nextToken);
                 }
 
                 if (inputIdx == input.length()) {
@@ -188,5 +146,129 @@ public final class RecursivePatternMatcher {
                 );
             }
         };
+    }
+
+    private static MatchResult handleQuestionMark(
+            String input,
+            int inputIdx,
+            String pattern,
+            int nextPatternIdx,
+            Token currentToken,
+            Token nextToken) {
+
+        int remainingPatternIdx =
+                nextPatternIdx + nextToken.getLength();
+
+        // Try consuming the optional character.
+        if (inputIdx < input.length()
+                && CharacterMatcher.matches(
+                input.charAt(inputIdx),
+                currentToken)) {
+
+            MatchResult result =
+                    doesRemainingPatternMatchHere(
+                            input,
+                            inputIdx + 1,
+                            pattern,
+                            remainingPatternIdx);
+
+            if (result.getMatched()) {
+                return result;
+            }
+        }
+
+        // Try skipping it.
+        return doesRemainingPatternMatchHere(
+                input,
+                inputIdx,
+                pattern,
+                remainingPatternIdx);
+    }
+
+    private static MatchResult handleStar(
+            String input,
+            int inputIdx,
+            String pattern,
+            int nextPatternIdx,
+            Token currentToken,
+            Token nextToken) {
+
+        int remainingPatternIdx =
+                nextPatternIdx + nextToken.getLength();
+
+        // Try matching zero occurrences.
+        MatchResult result =
+                doesRemainingPatternMatchHere(
+                        input,
+                        inputIdx,
+                        pattern,
+                        remainingPatternIdx);
+
+        if (result.getMatched()) {
+            return result;
+        }
+
+        // Now try 1, 2, 3... occurrences.
+        int candidateStartIdx = inputIdx;
+
+        while (candidateStartIdx < input.length()
+                && CharacterMatcher.matches(
+                input.charAt(candidateStartIdx),
+                currentToken)) {
+
+            candidateStartIdx++;
+
+            result = doesRemainingPatternMatchHere(
+                    input,
+                    candidateStartIdx,
+                    pattern,
+                    remainingPatternIdx);
+
+            if (result.getMatched()) {
+                return result;
+            }
+        }
+
+        return MatchResult.noMatch();
+    }
+
+    private static MatchResult handlePlus(
+            String input,
+            int inputIdx,
+            String pattern,
+            int nextPatternIdx,
+            Token currentToken,
+            Token nextToken) {
+        if (inputIdx == input.length()) {
+            return MatchResult.noMatch();
+        }
+        if (!CharacterMatcher.matches(input.charAt(inputIdx), currentToken)) {
+            return MatchResult.noMatch();
+        }
+        int remainingPatternIdx =
+                nextPatternIdx + nextToken.getLength();
+
+        int candidateStartIdx = inputIdx + 1;
+
+        while (true) {
+            MatchResult result = doesRemainingPatternMatchHere(
+                    input,
+                    candidateStartIdx,
+                    pattern,
+                    remainingPatternIdx);
+            if (result.getMatched()) {
+                return result;
+            }
+
+            if (candidateStartIdx >= input.length()
+                    || !CharacterMatcher.matches(
+                    input.charAt(candidateStartIdx),
+                    currentToken)) {
+
+                break;
+            }
+            candidateStartIdx++;
+        }
+        return MatchResult.noMatch();
     }
 }

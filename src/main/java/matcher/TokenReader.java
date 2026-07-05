@@ -21,6 +21,7 @@ public class TokenReader {
             case '^' -> readStartAnchorToken();
             case '$' -> readEndAnchorToken();
             case '+' -> readPlusQuantifierToken();
+            case '*' -> readStartQuantifierToken();
             case '?' -> readQuestionQuantifierToken();
             case '.' -> readWildCardToken();
             case '(' -> readAlternationToken(pattern, patternIdx);
@@ -60,6 +61,10 @@ public class TokenReader {
 
     private static Token readPlusQuantifierToken() {
         return new Token(TokenType.PLUS, 1, "+");
+    }
+
+    private static Token readStartQuantifierToken() {
+        return new Token(TokenType.STAR, 1, "*");
     }
 
     private static Token readEscapeToken(String pattern, int patternIdx) {
