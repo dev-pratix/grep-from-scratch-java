@@ -11,20 +11,24 @@ public final class CommandLineParser {
 
     public static CommandLineOptions parse(String[] args) {
         boolean onlyMatching = false;
-        boolean highlight = false;
+        ColorMode colorMode = ColorMode.NEVER;
         String pattern = null;
+        String fileName = null;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--color=")) {
-                String colorMode = args[i].substring("--color=".length());
-                switch (colorMode) {
-                    case "always" -> highlight = true;
-                    case "auto", "never" -> highlight = false;
+                String mode = args[i].substring("--color=".length());
+                colorMode = switch (mode) {
+                    case "always" -> ColorMode.ALWAYS;
+                    case "auto" -> ColorMode.AUTO;
+                    case "never" -> ColorMode.NEVER;
+
                     default -> throw new IllegalArgumentException(
-                            "Unknown color mode: " + colorMode);
-                }
+                            "Unknown color mode: " + mode);
+                };
 
                 continue;
+
             }
 
             switch (args[i]) {
@@ -37,8 +41,7 @@ public final class CommandLineParser {
 
                     pattern = args[++i];
                 }
-                default -> throw new IllegalArgumentException(
-                        "Unknown argument: " + args[i]);
+                default -> fileName = args[i];
             }
         }
         if (pattern == null) {
@@ -47,8 +50,9 @@ public final class CommandLineParser {
 
         return new CommandLineOptions(
                 onlyMatching,
-                highlight,
-                pattern
+                colorMode,
+                pattern,
+                fileName
         );
     }
 }

@@ -1,12 +1,23 @@
 import cli.Ansi;
+import cli.ColorMode;
 import cli.CommandLineOptions;
 import cli.CommandLineParser;
 import matcher.RecursivePatternMatcher;
 import model.MatchResult;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
+
+    private static boolean shouldHighlight(ColorMode colorMode) {
+        return switch (colorMode) {
+            case ALWAYS -> true;
+            case NEVER -> false;
+            case AUTO -> System.console() != null;
+        };
+    }
 
     /**
      * Builds a new string with every regex match highlighted.
@@ -126,14 +137,25 @@ public class Main {
         return found;
     }
 
-    public static void main(String[] args) {
+    private static Scanner createScanner(CommandLineOptions options) throws IOException {
+        if (options.getFileName() == null) {
+            return new Scanner(System.in);
+        }
+
+        return new Scanner(new File(options.getFileName()));
+    }
+
+    public static void main(String[] args) throws IOException {
         CommandLineOptions options =
                 CommandLineParser.parse(args);
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = createScanner(options);
 
         boolean foundMatch = false;
-
+        System.err.println("ColorMode = " + options.getColorMode());
+        System.err.println("Console   = " + System.console());
+        System.err.println("Highlight = " +
+                shouldHighlight(options.getColorMode()));
         while (scanner.hasNextLine()) {
 
             String inputLine = scanner.nextLine();
@@ -146,7 +168,7 @@ public class Main {
                 foundMatch |= printWholeLineIfMatched(
                         inputLine,
                         options.getPattern(),
-                        options.getHighlight());
+                        shouldHighlight(options.getColorMode()));
             }
         }
 

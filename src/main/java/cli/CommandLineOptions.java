@@ -1,22 +1,25 @@
 package cli;
 
 public class CommandLineOptions {
-    private final boolean highlight;
+    private final ColorMode colorMode;
     private final boolean onlyMatches;
     private final String pattern;
+    private final String fileName;
 
     public CommandLineOptions(
             boolean onlyMatches,
-            boolean highlight,
-            String pattern) {
+            ColorMode colorMode,
+            String pattern,
+            String fileName) {
 
         this.onlyMatches = onlyMatches;
-        this.highlight = highlight;
+        this.colorMode = colorMode;
         this.pattern = pattern;
+        this.fileName = fileName;
     }
 
-    public boolean getHighlight() {
-        return highlight;
+    public ColorMode getColorMode() {
+        return colorMode;
     }
 
     public boolean isOnlyMatching() {
@@ -25,6 +28,10 @@ public class CommandLineOptions {
 
     public String getPattern() {
         return pattern;
+    }
+
+    public String getFileName(){
+        return fileName;
     }
 
 }
