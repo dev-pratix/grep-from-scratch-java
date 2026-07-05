@@ -5,6 +5,9 @@ package cli;
 // Keep responsibilities separate.
 // Main should orchestrate, this class should only understand CLI arguments.
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class CommandLineParser {
     private CommandLineParser() {
     }
@@ -13,7 +16,7 @@ public final class CommandLineParser {
         boolean onlyMatching = false;
         ColorMode colorMode = ColorMode.NEVER;
         String pattern = null;
-        String fileName = null;
+        List<String> fileNames = new ArrayList<>();
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--color=")) {
@@ -41,7 +44,9 @@ public final class CommandLineParser {
 
                     pattern = args[++i];
                 }
-                default -> fileName = args[i];
+                default -> {
+                    fileNames.add(args[i]);
+                }
             }
         }
         if (pattern == null) {
@@ -52,7 +57,7 @@ public final class CommandLineParser {
                 onlyMatching,
                 colorMode,
                 pattern,
-                fileName
+                fileNames
         );
     }
 }

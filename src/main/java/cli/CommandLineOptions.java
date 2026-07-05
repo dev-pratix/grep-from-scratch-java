@@ -1,21 +1,23 @@
 package cli;
 
+import java.util.List;
+
 public class CommandLineOptions {
     private final ColorMode colorMode;
     private final boolean onlyMatches;
     private final String pattern;
-    private final String fileName;
+    private final List<String> fileNames;
 
     public CommandLineOptions(
             boolean onlyMatches,
             ColorMode colorMode,
             String pattern,
-            String fileName) {
+           List<String> fileNames) {
 
         this.onlyMatches = onlyMatches;
         this.colorMode = colorMode;
         this.pattern = pattern;
-        this.fileName = fileName;
+        this.fileNames = fileNames;
     }
 
     public ColorMode getColorMode() {
@@ -30,8 +32,8 @@ public class CommandLineOptions {
         return pattern;
     }
 
-    public String getFileName(){
-        return fileName;
+    public List<String> getFileNames(){
+        return fileNames;
     }
 
 }

@@ -137,38 +137,68 @@ public class Main {
         return found;
     }
 
-    private static Scanner createScanner(CommandLineOptions options) throws IOException {
-        if (options.getFileName() == null) {
-            return new Scanner(System.in);
-        }
+    // man need to change this coz need multi support file sys
+//    private static Scanner createScanner(CommandLineOptions options) throws IOException {
+//        if (options.getFileNames() == null) {
+//            return new Scanner(System.in);
+//        }
+//
+//        return new Scanner(new File(options.getFileNames()));
+//    }
 
-        return new Scanner(new File(options.getFileName()));
-    }
-
-    public static void main(String[] args) throws IOException {
-        CommandLineOptions options =
-                CommandLineParser.parse(args);
-
-        Scanner scanner = createScanner(options);
+    private static boolean processScanner(
+            Scanner scanner,
+            CommandLineOptions options,
+            String fileName) {
 
         boolean foundMatch = false;
-        System.err.println("ColorMode = " + options.getColorMode());
-        System.err.println("Console   = " + System.console());
-        System.err.println("Highlight = " +
-                shouldHighlight(options.getColorMode()));
+
         while (scanner.hasNextLine()) {
 
             String inputLine = scanner.nextLine();
 
             if (options.isOnlyMatching()) {
+
                 foundMatch |= printEachMatch(
                         inputLine,
                         options.getPattern());
+
             } else {
+
                 foundMatch |= printWholeLineIfMatched(
                         inputLine,
                         options.getPattern(),
                         shouldHighlight(options.getColorMode()));
+            }
+        }
+
+        return foundMatch;
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        CommandLineOptions options =
+                CommandLineParser.parse(args);
+
+        boolean foundMatch = false;
+
+        // No file supplied -> read from stdin
+        if (options.getFileNames().isEmpty()) {
+
+            foundMatch |= processScanner(
+                    new Scanner(System.in),
+                    options,
+                    null);
+
+        } else {
+
+            // Read every file one after another
+            for (String fileName : options.getFileNames()) {
+
+                foundMatch |= processScanner(
+                        new Scanner(new File(fileName)),
+                        options,
+                        fileName);
             }
         }
 
