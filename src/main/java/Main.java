@@ -76,7 +76,6 @@ public class Main {
             String inputLine,
             String pattern,
             boolean highlightOutput) {
-
         MatchResult result =
                 RecursivePatternMatcher.findMatch(
                         inputLine,
@@ -159,17 +158,12 @@ public class Main {
                 options.getFileNames().size() > 1;
 
         while (scanner.hasNextLine()) {
-
             String inputLine = scanner.nextLine();
-
             if (options.isOnlyMatching()) {
-
                 foundMatch |= printEachMatch(
                         inputLine,
                         options.getPattern());
-
             } else {
-
                 foundMatch |= printWholeLineIfMatched(
                         fileName,
                         multipleFiles,
@@ -189,7 +183,6 @@ public class Main {
         boolean foundMatch = false;
 
         if (options.getFileNames().isEmpty()) {
-
             foundMatch |= processScanner(
                     new Scanner(System.in),
                     options,
