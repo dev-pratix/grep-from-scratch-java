@@ -72,6 +72,7 @@ public class Main {
      */
     private static boolean printWholeLineIfMatched(
             String fileName,
+            boolean multipleFiles,
             String inputLine,
             String pattern,
             boolean highlightOutput) {
@@ -85,23 +86,15 @@ public class Main {
             return false;
         }
 
-        if (highlightOutput) {
-            String output = highlightAllMatches(
-                    inputLine,
-                    pattern);
+        String output = highlightOutput
+                ? highlightAllMatches(inputLine, pattern)
+                : inputLine;
 
-            if (fileName != null) {
-                output = fileName + ":" + output;
-            }
-
-            System.out.println(output);
-        } else {
-            String output = inputLine;
-            if (fileName != null) {
-                output = fileName + ":" + output;
-            }
-            System.out.println(output);
+        if (multipleFiles) {
+            output = fileName + ":" + output;
         }
+
+        System.out.println(output);
 
         return true;
     }
@@ -162,6 +155,9 @@ public class Main {
 
         boolean foundMatch = false;
 
+        boolean multipleFiles =
+                options.getFileNames().size() > 1;
+
         while (scanner.hasNextLine()) {
 
             String inputLine = scanner.nextLine();
@@ -176,6 +172,7 @@ public class Main {
 
                 foundMatch |= printWholeLineIfMatched(
                         fileName,
+                        multipleFiles,
                         inputLine,
                         options.getPattern(),
                         shouldHighlight(options.getColorMode()));
@@ -184,26 +181,32 @@ public class Main {
 
         return foundMatch;
     }
-
     public static void main(String[] args) throws IOException {
 
         CommandLineOptions options =
                 CommandLineParser.parse(args);
 
         boolean foundMatch = false;
-        // No file supplied -> read from stdin
+
         if (options.getFileNames().isEmpty()) {
+
             foundMatch |= processScanner(
                     new Scanner(System.in),
                     options,
                     null);
+
         } else {
-            // Read every file one after another
+
             for (String fileName : options.getFileNames()) {
-                foundMatch |= processScanner(
-                        new Scanner(new File(fileName)),
-                        options,
-                        fileName);
+
+                try (Scanner scanner =
+                             new Scanner(new File(fileName))) {
+
+                    foundMatch |= processScanner(
+                            scanner,
+                            options,
+                            fileName);
+                }
             }
         }
 
