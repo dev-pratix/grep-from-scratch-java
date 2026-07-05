@@ -71,6 +71,7 @@ public class Main {
      * Prints the whole line if it contains a match.
      */
     private static boolean printWholeLineIfMatched(
+            String fileName,
             String inputLine,
             String pattern,
             boolean highlightOutput) {
@@ -90,7 +91,11 @@ public class Main {
                             inputLine,
                             pattern));
         } else {
-            System.out.println(inputLine);
+            String output = inputLine;
+            if (fileName != null) {
+                output = fileName + ":" + output;
+            }
+            System.out.println(output);
         }
 
         return true;
@@ -107,7 +112,6 @@ public class Main {
 
         boolean found = false;
         int searchStart = 0;
-
         while (true) {
 
             MatchResult result =
@@ -166,6 +170,7 @@ public class Main {
             } else {
 
                 foundMatch |= printWholeLineIfMatched(
+                        fileName,
                         inputLine,
                         options.getPattern(),
                         shouldHighlight(options.getColorMode()));
@@ -181,20 +186,15 @@ public class Main {
                 CommandLineParser.parse(args);
 
         boolean foundMatch = false;
-
         // No file supplied -> read from stdin
         if (options.getFileNames().isEmpty()) {
-
             foundMatch |= processScanner(
                     new Scanner(System.in),
                     options,
                     null);
-
         } else {
-
             // Read every file one after another
             for (String fileName : options.getFileNames()) {
-
                 foundMatch |= processScanner(
                         new Scanner(new File(fileName)),
                         options,
