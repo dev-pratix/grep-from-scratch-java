@@ -86,10 +86,15 @@ public class Main {
         }
 
         if (highlightOutput) {
-            System.out.println(
-                    highlightAllMatches(
-                            inputLine,
-                            pattern));
+            String output = highlightAllMatches(
+                    inputLine,
+                    pattern);
+
+            if (fileName != null) {
+                output = fileName + ":" + output;
+            }
+
+            System.out.println(output);
         } else {
             String output = inputLine;
             if (fileName != null) {
