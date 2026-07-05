@@ -17,6 +17,7 @@ public final class CommandLineParser {
         ColorMode colorMode = ColorMode.NEVER;
         String pattern = null;
         List<String> fileNames = new ArrayList<>();
+        boolean recursive = false;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--color=")) {
@@ -36,6 +37,7 @@ public final class CommandLineParser {
 
             switch (args[i]) {
                 case "-o" -> onlyMatching = true;
+                case "-r" -> recursive = true;
                 case "-E" -> {
                     if (i + 1 >= args.length) {
                         throw new IllegalArgumentException(
@@ -57,7 +59,8 @@ public final class CommandLineParser {
                 onlyMatching,
                 colorMode,
                 pattern,
-                fileNames
+                fileNames,
+                recursive
         );
     }
 }
